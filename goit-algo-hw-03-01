@@ -1,0 +1,46 @@
+import os
+import shutil
+import argparse
+
+def copy_files(src_dir, dest_dir):
+    try:
+        # Перевірка наявності директорії призначення та створення її, якщо вона відсутня
+        if not os.path.exists(dest_dir):
+            os.makedirs(dest_dir)
+
+        # Рекурсивно перебираємо всі елементи у вихідній директорії та її піддиректоріях
+        for root, dirs, files in os.walk(src_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                
+                # Отримуємо розширення файлу
+                _, extension = os.path.splitext(file)
+                
+                # Створюємо шлях до піддиректорії у директорії призначення на основі розширення файлу
+                sub_dir = os.path.join(dest_dir, extension[1:])
+                if not os.path.exists(sub_dir):
+                    os.makedirs(sub_dir)
+
+                # Копіюємо файл у відповідну піддиректорію
+                shutil.copy2(file_path, os.path.join(sub_dir, file))
+        
+        print("Копіювання завершено.")
+    except Exception as e:
+        # Обробка винятків
+        print(f"Помилка при копіюванні файлів: {e}")
+
+def main():
+    # Створення парсера аргументів командного рядка
+    parser = argparse.ArgumentParser(description="Рекурсивне копіювання та сортування файлів.")
+    # Додавання аргументів
+    parser.add_argument("src_dir", help="Шлях до вихідної директорії")
+    parser.add_argument("dest_dir", nargs="?", default="dist", help="Шлях до директорії призначення (за замовчуванням - dist)")
+
+    # Розбір аргументів командного рядка
+    args = parser.parse_args()
+
+    # Виклик функції копіювання файлів
+    copy_files(args.src_dir, args.dest_dir)
+
+if __name__ == "__main__":
+    main()
