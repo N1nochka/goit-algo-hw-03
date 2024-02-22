@@ -9,20 +9,18 @@ def copy_files(src_dir, dest_dir):
             os.makedirs(dest_dir)
 
         # Рекурсивно перебираємо всі елементи у вихідній директорії та її піддиректоріях
-        for root, dirs, files in os.walk(src_dir):
-            for file in files:
-                file_path = os.path.join(root, file)
-                
-                # Отримуємо розширення файлу
-                _, extension = os.path.splitext(file)
-                
-                # Створюємо шлях до піддиректорії у директорії призначення на основі розширення файлу
+        for item in os.listdir(src_dir):
+            item_path = os.path.join(src_dir, item)
+            if os.path.isdir(item_path):
+                # Якщо елемент є директорією, рекурсивно викликаємо функцію для цієї директорії
+                copy_files(item_path, dest_dir)
+            else:
+                # Якщо елемент є файлом, копіюємо його до відповідної піддиректорії за розширенням файлу
+                _, extension = os.path.splitext(item)
                 sub_dir = os.path.join(dest_dir, extension[1:])
                 if not os.path.exists(sub_dir):
                     os.makedirs(sub_dir)
-
-                # Копіюємо файл у відповідну піддиректорію
-                shutil.copy2(file_path, os.path.join(sub_dir, file))
+                shutil.copy2(item_path, os.path.join(sub_dir, item))
         
         print("Копіювання завершено.")
     except Exception as e:
@@ -39,7 +37,7 @@ def main():
     # Розбір аргументів командного рядка
     args = parser.parse_args()
 
-    # Виклик функції копіювання файлів
+    # Виклик функції копіювання  файлів
     copy_files(args.src_dir, args.dest_dir)
 
 if __name__ == "__main__":
